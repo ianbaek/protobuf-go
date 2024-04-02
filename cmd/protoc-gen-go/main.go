@@ -38,9 +38,18 @@ func main() {
 		flags   flag.FlagSet
 		plugins = flags.String("plugins", "", "deprecated option")
 	)
+
+	var noOmitEmpty bool
+	flags.BoolVar(&noOmitEmpty, "noomitempty", false, "Exclude 'omitempty' option from JSON tags")
+
 	protogen.Options{
 		ParamFunc: flags.Set,
 	}.Run(func(gen *protogen.Plugin) error {
+		if noOmitEmpty {
+			os.Setenv("PROTOC_GEN_GO_NO_OMITEMPTY", "true")
+		} else {
+			os.Unsetenv("PROTOC_GEN_GO_NO_OMITEMPTY")
+		}
 		if *plugins != "" {
 			return errors.New("protoc-gen-go: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC\n\n" +
 				"See " + grpcDocURL + " for more information.")

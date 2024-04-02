@@ -11,6 +11,7 @@ import (
 	"go/parser"
 	"go/token"
 	"math"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -732,6 +733,10 @@ func fieldDefaultValue(g *protogen.GeneratedFile, f *fileInfo, m *messageInfo, f
 }
 
 func fieldJSONTagValue(field *protogen.Field) string {
+	noOmitEmpty := os.Getenv("PROTOC_GEN_GO_NO_OMITEMPTY") == "true"
+	if noOmitEmpty {
+		return string(field.Desc.Name())
+	}
 	return string(field.Desc.Name()) + ",omitempty"
 }
 
